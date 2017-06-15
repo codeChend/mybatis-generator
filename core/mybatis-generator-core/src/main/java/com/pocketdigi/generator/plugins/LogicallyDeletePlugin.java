@@ -45,6 +45,9 @@ public class LogicallyDeletePlugin extends PluginAdapter {
 
     @Override
     public boolean clientUpdateByExampleWithoutBLOBsMethodGenerated(Method method, Interface interfaze, IntrospectedTable introspectedTable) {
+        IntrospectedColumn deletedColumn = introspectedTable.getColumn(this.column);
+        if(deletedColumn==null)
+            return true;
         if (introspectedTable.getTargetRuntime() == IntrospectedTable.TargetRuntime.MYBATIS3) {
             addDeleteByPrimaryKeyJava(method, interfaze, introspectedTable);
             addDeleteByExampleJava(method, interfaze, introspectedTable);
@@ -54,6 +57,9 @@ public class LogicallyDeletePlugin extends PluginAdapter {
     @Override
     public boolean sqlMapDocumentGenerated(Document document,
                                            IntrospectedTable introspectedTable) {
+        IntrospectedColumn deletedColumn = introspectedTable.getColumn(this.column);
+        if(deletedColumn==null)
+            return true;
         List<XmlElement> elements = elementsToAdd.get(introspectedTable.getFullyQualifiedTable());
         if (elements != null) {
             for (XmlElement element : elements) {
@@ -65,6 +71,10 @@ public class LogicallyDeletePlugin extends PluginAdapter {
     }
     @Override
     public boolean sqlMapUpdateByExampleWithoutBLOBsElementGenerated(XmlElement element, IntrospectedTable introspectedTable) {
+        IntrospectedColumn deletedColumn = introspectedTable.getColumn(this.column);
+        if(deletedColumn==null)
+            return true;
+
         if (introspectedTable.getTargetRuntime() == IntrospectedTable.TargetRuntime.MYBATIS3) {
             addDeleteByPrimaryKeyXml(introspectedTable.getFullyQualifiedTable(),introspectedTable);
             addDeletedByExampleXml(introspectedTable.getFullyQualifiedTable(),introspectedTable);
@@ -74,6 +84,10 @@ public class LogicallyDeletePlugin extends PluginAdapter {
 
     @Override
     public boolean modelExampleClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+        IntrospectedColumn deletedColumn = introspectedTable.getColumn(this.column);
+        if(deletedColumn==null)
+            return true;
+
         Method newMethod = new Method("orNotDeleted");
         List<InnerClass> innerClasses = topLevelClass.getInnerClasses();
         FullyQualifiedJavaType returnType=null;
@@ -86,7 +100,7 @@ public class LogicallyDeletePlugin extends PluginAdapter {
         newMethod.setReturnType(returnType);
         newMethod.setVisibility(JavaVisibility.PUBLIC);
         newMethod.addBodyLine("Criteria criteria = createCriteriaInternal();");
-        String javaProperty = introspectedTable.getColumn(column).getJavaProperty();
+        String javaProperty = deletedColumn.getJavaProperty();
         javaProperty=javaProperty.substring(0, 1).toUpperCase() + javaProperty.substring(1);
         newMethod.addBodyLine("criteria.and"+ javaProperty +"EqualTo(\""+unDeletedValue+"\");");
         newMethod.addBodyLine("oredCriteria.add(criteria);");
@@ -162,7 +176,7 @@ public class LogicallyDeletePlugin extends PluginAdapter {
     private void addDeleteByPrimaryKeyXml(FullyQualifiedTable fqt, IntrospectedTable introspectedTable) {
         XmlElement answer = new XmlElement("update");
         answer.addAttribute(new Attribute("id","logicallyDeleteByPrimaryKey"));
-        answer.addAttribute(new Attribute("resultType", "java.lang.Long"));
+//        answer.addAttribute(new Attribute("resultType", "java.lang.Long"));
         String parameterType;
         if (introspectedTable.getRules().generatePrimaryKeyClass()) {
             parameterType = introspectedTable.getPrimaryKeyType();
@@ -215,7 +229,7 @@ public class LogicallyDeletePlugin extends PluginAdapter {
         answer.addAttribute(new Attribute("id","logicallyDeleteByExample"));
 
         answer.addAttribute(new Attribute("parameterType", introspectedTable.getExampleType())); //$NON-NLS-1$
-        answer.addAttribute(new Attribute("resultType", "java.lang.Long")); //$NON-NLS-1$ //$NON-NLS-2$
+//        answer.addAttribute(new Attribute("resultType", "java.lang.Long")); //$NON-NLS-1$ //$NON-NLS-2$
         StringBuilder sb = new StringBuilder();
         sb.append("update ");
         sb.append(introspectedTable.getFullyQualifiedTableNameAtRuntime());

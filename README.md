@@ -15,7 +15,7 @@ MyBatis Generator 增强版
 
 1. 注释
 
-        <plugin type="com.pocketdigi.generator.plugins.FiledCommentPlugin" />
+        <plugin type="com.pocketdigi.generator.plugins.FieldCommentPlugin" />
  
 2. 逻辑删除
     
