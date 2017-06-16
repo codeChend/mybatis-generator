@@ -147,7 +147,7 @@ public class LogicallyDeletePlugin extends PluginAdapter {
         }
 
         interfaze.addImportedTypes(importedTypes);
-        newMethod.setReturnType(new FullyQualifiedJavaType("long")); //$NON-NLS-1$
+        newMethod.setReturnType(new FullyQualifiedJavaType("int")); //$NON-NLS-1$
         interfaze.addMethod(newMethod);
     }
 
@@ -160,7 +160,7 @@ public class LogicallyDeletePlugin extends PluginAdapter {
 
 
         newMethod.setVisibility(JavaVisibility.PUBLIC);
-        newMethod.setReturnType(new FullyQualifiedJavaType("long")); //$NON-NLS-1$
+        newMethod.setReturnType(new FullyQualifiedJavaType("int")); //$NON-NLS-1$
         interfaze.addImportedTypes(importedTypes);
         newMethod.addParameter(new Parameter(exampleType, "example")); //$NON-NLS-1$
         interfaze.addMethod(newMethod);
