@@ -10,6 +10,7 @@ MyBatis Generator 增强版
 2. 逻辑删除。可以设置逻辑删除字段、删除时的值、未删除时的值。
 3. Mysql物理分页。使用offset limit分页
 4. 通过Example找出一条数据
+5. 批量插入
 
 ### 使用方法
 
@@ -36,3 +37,7 @@ MyBatis Generator 增强版
 4. SelectOneByExample
 
         <plugin type="com.pocketdigi.generator.plugins.SelectOneByExamplePlugin" />
+        
+5. 批量插入
+    
+        <plugin type="com.pocketdigi.generator.plugins.InsertBatchPlugin" />

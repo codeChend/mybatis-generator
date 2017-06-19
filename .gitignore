@@ -49,3 +49,4 @@
 /core/mybatis-generator-systests-domtests/target
 /.project
 **/.idea/
+**/.iml
