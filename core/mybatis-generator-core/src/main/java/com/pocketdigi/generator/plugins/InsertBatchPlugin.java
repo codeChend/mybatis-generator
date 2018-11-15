@@ -75,12 +75,12 @@ public class InsertBatchPlugin extends PluginAdapter {
         StringBuilder insertClause = new StringBuilder();
         StringBuilder valuesClause = new StringBuilder();
 
-        insertClause.append("insert into "); //$NON-NLS-1$
+        insertClause.append("insert into ");
         insertClause.append(introspectedTable
             .getFullyQualifiedTableNameAtRuntime());
-        insertClause.append(" ("); //$NON-NLS-1$
+        insertClause.append(" (");
 
-        valuesClause.append("values \n"); //$NON-NLS-1$
+        valuesClause.append("values \n");
         valuesClause.append("<foreach collection=\"list\" index=\"index\" item=\"item\" separator=\",\" >\n");
         valuesClause.append("(\n<trim suffixOverrides=\",\" >\n");
 
@@ -95,8 +95,8 @@ public class InsertBatchPlugin extends PluginAdapter {
             valuesClause.append(MyBatis3FormattingUtilities
                 .getParameterClause(introspectedColumn,"item."));
             if (i + 1 < columns.size()) {
-                insertClause.append(", "); //$NON-NLS-1$
-                valuesClause.append(", "); //$NON-NLS-1$
+                insertClause.append(", ");
+                valuesClause.append(", ");
             }
 
             if (valuesClause.length() > 80) {

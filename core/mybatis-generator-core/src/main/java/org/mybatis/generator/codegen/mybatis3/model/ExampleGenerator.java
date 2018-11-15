@@ -67,7 +67,7 @@ public class ExampleGenerator extends AbstractJavaGenerator {
         method.setVisibility(JavaVisibility.PUBLIC);
         method.setConstructor(true);
         method.setName(type.getShortName());
-        method.addBodyLine("oredCriteria = new ArrayList<Criteria>();"); //$NON-NLS-1$
+        method.addBodyLine("oredCriteria = new ArrayList<>();"); //$NON-NLS-1$
 
         commentGenerator.addGeneralMethodComment(method, introspectedTable);
         topLevelClass.addMethod(method);
@@ -166,7 +166,7 @@ public class ExampleGenerator extends AbstractJavaGenerator {
         method.setName("createCriteria"); //$NON-NLS-1$
         method.setReturnType(FullyQualifiedJavaType.getCriteriaInstance());
         method.addBodyLine("Criteria criteria = createCriteriaInternal();"); //$NON-NLS-1$
-        method.addBodyLine("if (oredCriteria.size() == 0) {"); //$NON-NLS-1$
+        method.addBodyLine("if (oredCriteria.isEmpty()) {"); //$NON-NLS-1$
         method.addBodyLine("oredCriteria.add(criteria);"); //$NON-NLS-1$
         method.addBodyLine("}"); //$NON-NLS-1$
         method.addBodyLine("return criteria;"); //$NON-NLS-1$
@@ -177,8 +177,7 @@ public class ExampleGenerator extends AbstractJavaGenerator {
         method.setVisibility(JavaVisibility.PROTECTED);
         method.setName("createCriteriaInternal"); //$NON-NLS-1$
         method.setReturnType(FullyQualifiedJavaType.getCriteriaInstance());
-        method.addBodyLine("Criteria criteria = new Criteria();"); //$NON-NLS-1$
-        method.addBodyLine("return criteria;"); //$NON-NLS-1$
+        method.addBodyLine("return new Criteria();"); //$NON-NLS-1$
         commentGenerator.addGeneralMethodComment(method, introspectedTable);
         topLevelClass.addMethod(method);
 
@@ -385,7 +384,6 @@ public class ExampleGenerator extends AbstractJavaGenerator {
 
         InnerClass answer = new InnerClass(FullyQualifiedJavaType
                 .getGeneratedCriteriaInstance());
-
         answer.setVisibility(JavaVisibility.PROTECTED);
         answer.setStatic(true);
         answer.setAbstract(true);
@@ -397,7 +395,7 @@ public class ExampleGenerator extends AbstractJavaGenerator {
         method.setName("GeneratedCriteria"); //$NON-NLS-1$
         method.setConstructor(true);
         method.addBodyLine("super();"); //$NON-NLS-1$
-        method.addBodyLine("criteria = new ArrayList<Criterion>();"); //$NON-NLS-1$
+        method.addBodyLine("criteria = new ArrayList<>();"); //$NON-NLS-1$
         answer.addMethod(method);
 
         List<String> criteriaLists = new ArrayList<String>();
@@ -421,9 +419,9 @@ public class ExampleGenerator extends AbstractJavaGenerator {
                 .getBooleanPrimitiveInstance());
         StringBuilder sb = new StringBuilder();
         Iterator<String> strIter = criteriaLists.iterator();
-        sb.append("return "); //$NON-NLS-1$
+        sb.append("return !"); //$NON-NLS-1$
         sb.append(strIter.next());
-        sb.append(".size() > 0"); //$NON-NLS-1$
+        sb.append(".isEmpty()"); //$NON-NLS-1$
         if (!strIter.hasNext()) {
             sb.append(';');
         }
@@ -433,7 +431,7 @@ public class ExampleGenerator extends AbstractJavaGenerator {
             OutputUtilities.javaIndent(sb, 1);
             sb.append("|| "); //$NON-NLS-1$
             sb.append(strIter.next());
-            sb.append(".size() > 0"); //$NON-NLS-1$
+            sb.append(".isEmpty() > 0"); //$NON-NLS-1$
             if (!strIter.hasNext()) {
                 sb.append(';');
             }
@@ -499,10 +497,10 @@ public class ExampleGenerator extends AbstractJavaGenerator {
         method.setName("addCriterion"); //$NON-NLS-1$
         method.addParameter(new Parameter(FullyQualifiedJavaType
                 .getStringInstance(), "condition")); //$NON-NLS-1$
-        method.addBodyLine("if (condition == null) {"); //$NON-NLS-1$
-        method
-                .addBodyLine("throw new RuntimeException(\"Value for condition cannot be null\");"); //$NON-NLS-1$
-        method.addBodyLine("}"); //$NON-NLS-1$
+//        method.addBodyLine("if (condition == null) {"); //$NON-NLS-1$
+//        method
+//                .addBodyLine("throw new RuntimeException(\"Value for condition cannot be null\");"); //$NON-NLS-1$
+//        method.addBodyLine("}"); //$NON-NLS-1$
         method.addBodyLine("criteria.add(new Criterion(condition));"); //$NON-NLS-1$
         if (criteriaLists.size() > 1) {
             method.addBodyLine("allCriteria = null;"); //$NON-NLS-1$
@@ -516,12 +514,11 @@ public class ExampleGenerator extends AbstractJavaGenerator {
                 .getStringInstance(), "condition")); //$NON-NLS-1$
         method.addParameter(new Parameter(FullyQualifiedJavaType
                 .getObjectInstance(), "value")); //$NON-NLS-1$
-        method.addParameter(new Parameter(FullyQualifiedJavaType
-                .getStringInstance(), "property")); //$NON-NLS-1$
-        method.addBodyLine("if (value == null) {"); //$NON-NLS-1$
-        method
-                .addBodyLine("throw new RuntimeException(\"Value for \" + property + \" cannot be null\");"); //$NON-NLS-1$
-        method.addBodyLine("}"); //$NON-NLS-1$
+
+//        method.addBodyLine("if (value == null) {"); //$NON-NLS-1$
+//        method
+//                .addBodyLine("throw new RuntimeException(\"Value for \" + property + \" cannot be null\");"); //$NON-NLS-1$
+//        method.addBodyLine("}"); //$NON-NLS-1$
         method.addBodyLine("criteria.add(new Criterion(condition, value));"); //$NON-NLS-1$
         if (criteriaLists.size() > 1) {
             method.addBodyLine("allCriteria = null;"); //$NON-NLS-1$
@@ -537,12 +534,10 @@ public class ExampleGenerator extends AbstractJavaGenerator {
                 .getObjectInstance(), "value1")); //$NON-NLS-1$
         method.addParameter(new Parameter(FullyQualifiedJavaType
                 .getObjectInstance(), "value2")); //$NON-NLS-1$
-        method.addParameter(new Parameter(FullyQualifiedJavaType
-                .getStringInstance(), "property")); //$NON-NLS-1$
-        method.addBodyLine("if (value1 == null || value2 == null) {"); //$NON-NLS-1$
-        method
-                .addBodyLine("throw new RuntimeException(\"Between values for \" + property + \" cannot be null\");"); //$NON-NLS-1$
-        method.addBodyLine("}"); //$NON-NLS-1$
+//        method.addBodyLine("if (value1 == null || value2 == null) {"); //$NON-NLS-1$
+//        method
+//                .addBodyLine("throw new RuntimeException(\"Between values for \" + property + \" cannot be null\");"); //$NON-NLS-1$
+//        method.addBodyLine("}"); //$NON-NLS-1$
         method
                 .addBodyLine("criteria.add(new Criterion(condition, value1, value2));"); //$NON-NLS-1$
         if (criteriaLists.size() > 1) {
@@ -793,9 +788,7 @@ public class ExampleGenerator extends AbstractJavaGenerator {
         sb.append(operator);
         sb.append("\", "); //$NON-NLS-1$
         sb.append("value"); //$NON-NLS-1$
-        sb.append(", \""); //$NON-NLS-1$
-        sb.append(introspectedColumn.getJavaProperty());
-        sb.append("\");"); //$NON-NLS-1$
+        sb.append(");"); //$NON-NLS-1$
         method.addBodyLine(sb.toString());
         method.addBodyLine("return (Criteria) this;"); //$NON-NLS-1$
 
@@ -854,9 +847,7 @@ public class ExampleGenerator extends AbstractJavaGenerator {
         }
         sb.append("\", "); //$NON-NLS-1$
         sb.append("value1, value2"); //$NON-NLS-1$
-        sb.append(", \""); //$NON-NLS-1$
-        sb.append(introspectedColumn.getJavaProperty());
-        sb.append("\");"); //$NON-NLS-1$
+        sb.append(");"); //$NON-NLS-1$
         method.addBodyLine(sb.toString());
         method.addBodyLine("return (Criteria) this;"); //$NON-NLS-1$
 
@@ -921,9 +912,11 @@ public class ExampleGenerator extends AbstractJavaGenerator {
         } else {
             sb.append(" not in"); //$NON-NLS-1$
         }
-        sb.append("\", values, \""); //$NON-NLS-1$
-        sb.append(introspectedColumn.getJavaProperty());
-        sb.append("\");"); //$NON-NLS-1$
+        sb.append("\", values"); //$NON-NLS-1$
+        sb.append(");"); //$NON-NLS-1$
+
+
+
         method.addBodyLine(sb.toString());
         method.addBodyLine("return (Criteria) this;"); //$NON-NLS-1$
 
