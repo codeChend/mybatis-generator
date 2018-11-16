@@ -62,7 +62,7 @@ spring boot配置PageHelper Bean：
 
 Page.java:
 
-```
+``` java
 public final class Page<T> {
     private Integer currentPage;
 
