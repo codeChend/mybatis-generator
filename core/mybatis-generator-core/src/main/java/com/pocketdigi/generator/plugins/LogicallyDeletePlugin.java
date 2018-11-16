@@ -26,7 +26,7 @@ public class LogicallyDeletePlugin extends PluginAdapter {
     public LogicallyDeletePlugin() {
         elementsToAdd = new HashMap<FullyQualifiedTable, List<XmlElement>>();
     }
-
+    @Override
     public boolean validate(List<String> warnings) {
         return true;
     }
@@ -46,8 +46,9 @@ public class LogicallyDeletePlugin extends PluginAdapter {
     @Override
     public boolean clientUpdateByExampleWithoutBLOBsMethodGenerated(Method method, Interface interfaze, IntrospectedTable introspectedTable) {
         IntrospectedColumn deletedColumn = introspectedTable.getColumn(this.column);
-        if(deletedColumn==null)
+        if(deletedColumn==null) {
             return true;
+        }
         if (introspectedTable.getTargetRuntime() == IntrospectedTable.TargetRuntime.MYBATIS3) {
             addDeleteByPrimaryKeyJava(method, interfaze, introspectedTable);
             addDeleteByExampleJava(method, interfaze, introspectedTable);
@@ -102,7 +103,17 @@ public class LogicallyDeletePlugin extends PluginAdapter {
         newMethod.addBodyLine("Criteria criteria = createCriteriaInternal();");
         String javaProperty = deletedColumn.getJavaProperty();
         javaProperty=javaProperty.substring(0, 1).toUpperCase() + javaProperty.substring(1);
-        newMethod.addBodyLine("criteria.and"+ javaProperty +"EqualTo(\""+unDeletedValue+"\");");
+        if(deletedColumn.isStringColumn()){
+            newMethod.addBodyLine("criteria.and"+ javaProperty +"EqualTo(\""+unDeletedValue+"\");");
+        }else{
+            if(deletedColumn.isByteColumn()) {
+                newMethod.addBodyLine("criteria.and"+ javaProperty +"EqualTo((byte)"+unDeletedValue+");");
+            }else if(deletedColumn.isIntegerColumn()){
+                newMethod.addBodyLine("criteria.and"+ javaProperty +"EqualTo("+unDeletedValue+");");
+            }else{
+                throw new IllegalArgumentException("Not support logically delete type \""+deletedColumn.getJdbcTypeName()+"\"");
+            }
+        }
         newMethod.addBodyLine("oredCriteria.add(criteria);");
         newMethod.addBodyLine("return criteria;");
         topLevelClass.addMethod(newMethod);

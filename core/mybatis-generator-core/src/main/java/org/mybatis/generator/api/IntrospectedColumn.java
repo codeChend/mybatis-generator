@@ -220,6 +220,18 @@ public class IntrospectedColumn {
                 && "TIME".equalsIgnoreCase(jdbcTypeName); //$NON-NLS-1$
     }
 
+    public boolean isByteColumn() {
+        FullyQualifiedJavaType byteJavaType = new FullyQualifiedJavaType(
+            "java.lang.Byte");
+        return fullyQualifiedJavaType.equals(byteJavaType);
+    }
+
+    public boolean isIntegerColumn() {
+        FullyQualifiedJavaType byteJavaType = new FullyQualifiedJavaType(
+            "java.lang.Integer");
+        return fullyQualifiedJavaType.equals(byteJavaType);
+    }
+
     public String getTypeHandler() {
         return typeHandler;
     }
