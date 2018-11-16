@@ -53,10 +53,11 @@ spring boot配置PageHelper Bean：
 
 使用：
 
-```
+``` java
  ConfigExample example=new ConfigExample();
-        example.orNotDeleted();
-        Page<Config> configPage = pageHelper.selectByExamplePaging(example, 1, 2);
+ example.orNotDeleted();
+ Page<Config> configPage = pageHelper.selectByExamplePaging(example, 1, 2);
+ 
 ```
 
 Page.java:
