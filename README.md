@@ -15,15 +15,15 @@ MyBatis Generator 增强版
 ### 使用方法
 
 1. 注释
-
-```
+ 
+``` xml
     <plugin type="com.pocketdigi.generator.plugins.FieldCommentPlugin" />
 
 ```
  
 2. 逻辑删除
 
-```
+``` xml
       <plugin type="com.pocketdigi.generator.plugins.LogicallyDeletePlugin" >
           <property name="column" value="is_deleted" />
           <property name="deletedValue" value="1" />
@@ -35,7 +35,7 @@ MyBatis Generator 增强版
     
 3. 物理分页
 
-```
+``` xml
       <plugin type="com.pocketdigi.generator.plugins.MySQLPagingPlugin" >
           <property name="pageHelperPackage" value="com.pocketdigi.demo.dal.page" />
       </plugin>
@@ -44,7 +44,7 @@ MyBatis Generator 增强版
 
 spring boot配置PageHelper Bean：
 
-```
+``` java
     @Bean
     public PageHelper pageHelper(SqlSessionFactory sessionFactory){
         return new PageHelper(sessionFactory);
@@ -54,7 +54,7 @@ spring boot配置PageHelper Bean：
 使用：
 
 ``` java
- ConfigExample example=new ConfigExample();
+ ConfigExample example = new ConfigExample();
  example.orNotDeleted();
  Page<Config> configPage = pageHelper.selectByExamplePaging(example, 1, 2);
  
@@ -78,13 +78,13 @@ public final class Page<T> {
 
 4. SelectOneByExample
 
-```
+``` xml
 <plugin type="com.pocketdigi.generator.plugins.SelectOneByExamplePlugin" />
 ```
         
 5. 批量插入
     
-```
+``` xml
 <plugin type="com.pocketdigi.generator.plugins.InsertBatchPlugin" />
 ```
         
