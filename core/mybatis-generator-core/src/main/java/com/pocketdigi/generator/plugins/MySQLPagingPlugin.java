@@ -15,13 +15,19 @@
  */
 package com.pocketdigi.generator.plugins;
 
+import java.util.Properties;
 import org.mybatis.generator.api.FullyQualifiedTable;
+import org.mybatis.generator.api.GeneratedJavaFile;
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
+import org.mybatis.generator.api.dom.java.Field;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.java.Interface;
+import org.mybatis.generator.api.dom.java.JavaVisibility;
 import org.mybatis.generator.api.dom.java.Method;
 import org.mybatis.generator.api.dom.java.Parameter;
+import org.mybatis.generator.api.dom.java.TopLevelClass;
 import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.Document;
 import org.mybatis.generator.api.dom.xml.TextElement;
@@ -31,6 +37,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.mybatis.generator.config.Context;
+import org.mybatis.generator.config.PropertyRegistry;
+import org.mybatis.generator.config.TableConfiguration;
+import org.mybatis.generator.internal.util.JavaBeansUtil;
 
 import static org.mybatis.generator.internal.util.StringUtility.stringHasValue;
 
@@ -42,6 +52,7 @@ public class MySQLPagingPlugin extends PluginAdapter {
 
     private FullyQualifiedJavaType offset, limit;
     private Map<FullyQualifiedTable, List<XmlElement>> elementsToAdd;
+    private String pageHelperPackage;
 
     public MySQLPagingPlugin() {
         offset = new FullyQualifiedJavaType("int");
@@ -54,6 +65,27 @@ public class MySQLPagingPlugin extends PluginAdapter {
         return true;
     }
 
+    @Override
+    public void setProperties(Properties properties) {
+        super.setProperties(properties);
+        Object pageHelperPackageProp = properties.get("pageHelperPackage");
+        if(pageHelperPackageProp!=null){
+            //配置了PageHelper
+            this.pageHelperPackage=pageHelperPackageProp.toString();
+        }
+    }
+
+
+    @Override
+    public List<GeneratedJavaFile> contextGenerateAdditionalJavaFiles() {
+        if(pageHelperPackage!=null&& pageHelperPackage.length()>0) {
+            List<GeneratedJavaFile> javaFileList=new ArrayList<GeneratedJavaFile>(2);
+            javaFileList.add(pageJavaFile());
+            javaFileList.add(pageHelperJavaFile());
+            return javaFileList;
+        }
+        return null;
+    }
 
     @Override
     public boolean clientSelectByExampleWithoutBLOBsMethodGenerated(
@@ -185,6 +217,185 @@ public class MySQLPagingPlugin extends PluginAdapter {
         ifElement.addElement(includeElement);
 
         return ifElement;
+    }
+
+
+    private GeneratedJavaFile pageJavaFile() {
+        FullyQualifiedJavaType fullyQualifiedJavaType = new FullyQualifiedJavaType(pageHelperPackage+".Page");
+        fullyQualifiedJavaType.addTypeArgument(new FullyQualifiedJavaType("T"));
+        TopLevelClass topLevelClass=new TopLevelClass(fullyQualifiedJavaType);
+        topLevelClass.setFinal(true);
+        topLevelClass.setVisibility(JavaVisibility.PUBLIC);
+        topLevelClass.addImportedType(new FullyQualifiedJavaType("java.util.List"));
+
+        topLevelClass.addJavaDocLine("/**");
+        topLevelClass.addJavaDocLine(" * 由Mybatis Generator增强版生成，不要手动修改");
+        topLevelClass.addJavaDocLine(" * @see <a href=\"https://github.com/pocketdigi/mybatis-generator\">https://github.com/pocketdigi/mybatis-generator</a>");
+        topLevelClass.addJavaDocLine(" * @author Exception");
+        topLevelClass.addJavaDocLine(" */");
+
+        //currentPage
+        Field currentPageField=new Field();
+        currentPageField.setName("currentPage");
+        currentPageField.setType(new FullyQualifiedJavaType("java.lang.Integer"));
+        currentPageField.setVisibility(JavaVisibility.PRIVATE);
+        topLevelClass.addField(currentPageField);
+        topLevelClass.addMethod(getJavaBeansGetter(currentPageField));
+        topLevelClass.addMethod(getJavaBeansSetter(currentPageField));
+
+        //totalPage
+        Field totalPage=new Field();
+        totalPage.setName("totalPage");
+        totalPage.setType(new FullyQualifiedJavaType("java.lang.Integer"));
+        totalPage.setVisibility(JavaVisibility.PRIVATE);
+        topLevelClass.addField(totalPage);
+        topLevelClass.addMethod(getJavaBeansGetter(totalPage));
+        topLevelClass.addMethod(getJavaBeansSetter(totalPage));
+
+
+        //pageSize
+        Field pageSize=new Field();
+        pageSize.setName("pageSize");
+        pageSize.setType(new FullyQualifiedJavaType("java.lang.Integer"));
+        pageSize.setVisibility(JavaVisibility.PRIVATE);
+        topLevelClass.addField(pageSize);
+        topLevelClass.addMethod(getJavaBeansGetter(pageSize));
+        topLevelClass.addMethod(getJavaBeansSetter(pageSize));
+
+        //currentPage
+        Field totalCount=new Field();
+        totalCount.setName("totalCount");
+        totalCount.setType(new FullyQualifiedJavaType("java.lang.Long"));
+        totalCount.setVisibility(JavaVisibility.PRIVATE);
+        topLevelClass.addField(totalCount);
+        topLevelClass.addMethod(getJavaBeansGetter(totalCount));
+        topLevelClass.addMethod(getJavaBeansSetter(totalCount));
+
+        //currentPage
+        Field dataList=new Field();
+        dataList.setName("dataList");
+        FullyQualifiedJavaType newListInstance = FullyQualifiedJavaType.getNewListInstance();
+        newListInstance.addTypeArgument(new FullyQualifiedJavaType("T"));
+        dataList.setType(newListInstance);
+        dataList.setVisibility(JavaVisibility.PRIVATE);
+        topLevelClass.addField(dataList);
+
+        topLevelClass.addMethod(getJavaBeansGetter(dataList));
+        topLevelClass.addMethod(getJavaBeansSetter(dataList));
+
+        String targetProject=context.getJavaClientGeneratorConfiguration().getTargetProject();
+        String encoding = context.getProperty(PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING);
+
+        return new GeneratedJavaFile(topLevelClass,targetProject,encoding,context.getJavaFormatter());
+    }
+
+    private GeneratedJavaFile pageHelperJavaFile() {
+        FullyQualifiedJavaType fullyQualifiedJavaType = new FullyQualifiedJavaType(pageHelperPackage+".PageHelper");
+        TopLevelClass topLevelClass=new TopLevelClass(fullyQualifiedJavaType);
+        topLevelClass.setFinal(true);
+        topLevelClass.setVisibility(JavaVisibility.PUBLIC);
+        topLevelClass.addImportedType(new FullyQualifiedJavaType("java.util.List"));
+        topLevelClass.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.session.SqlSession"));
+        topLevelClass.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.session.SqlSessionFactory"));
+        topLevelClass.addImportedType(new FullyQualifiedJavaType(context.getJavaModelGeneratorConfiguration().getTargetPackage()+".*"));
+        topLevelClass.addImportedType(new FullyQualifiedJavaType(context.getJavaClientGeneratorConfiguration().getTargetPackage()+".*"));
+        topLevelClass.addJavaDocLine("/**");
+        topLevelClass.addJavaDocLine(" * 由Mybatis Generator增强版生成，不要手动修改");
+        topLevelClass.addJavaDocLine(" * @see <a href=\"https://github.com/pocketdigi/mybatis-generator\">https://github.com/pocketdigi/mybatis-generator</a>");
+        topLevelClass.addJavaDocLine(" * @author Exception");
+        topLevelClass.addJavaDocLine(" */");
+
+        //sessionFactory
+        Field sessionFactory=new Field();
+        sessionFactory.setName("sessionFactory");
+        sessionFactory.setType(new FullyQualifiedJavaType("org.apache.ibatis.session.SqlSessionFactory"));
+        sessionFactory.setVisibility(JavaVisibility.PRIVATE);
+        topLevelClass.addField(sessionFactory);
+
+        //construct
+        Method constructMethod=new Method();
+        constructMethod.setVisibility(JavaVisibility.PUBLIC);
+        constructMethod.setConstructor(true);
+        constructMethod.setName(fullyQualifiedJavaType.getShortName());
+        constructMethod.addParameter(new Parameter(sessionFactory.getType(),"sessionFactory"));
+        constructMethod.addBodyLine("this.sessionFactory = sessionFactory;");
+        topLevelClass.addMethod(constructMethod);
+
+        List<TableConfiguration> tableConfigurations = context.getTableConfigurations();
+        for(TableConfiguration tableConfiguration:tableConfigurations) {
+            Method selectMethod=new Method();
+            selectMethod.setVisibility(JavaVisibility.PUBLIC);
+            String domainObjectName = tableConfiguration.getDomainObjectName();
+            FullyQualifiedJavaType returnType = new FullyQualifiedJavaType(pageHelperPackage+".Page");
+            returnType.addTypeArgument(new FullyQualifiedJavaType(
+                domainObjectName));
+            selectMethod.setReturnType(returnType);
+            selectMethod.setName("selectByExamplePaging");
+            selectMethod.addParameter(new Parameter(new FullyQualifiedJavaType(
+                domainObjectName +"Example"),"example"));
+            selectMethod.addParameter(new Parameter(FullyQualifiedJavaType.getIntInstance(),"currentPage"));
+            selectMethod.addParameter(new Parameter(FullyQualifiedJavaType.getIntInstance(),"pageSize"));
+            selectMethod.addBodyLine("try(SqlSession sqlSession = sessionFactory.openSession()) {");
+            String mapper=domainObjectName+"Mapper"+" mapper = "+"sqlSession.getMapper("+domainObjectName+"Mapper.class);";
+            selectMethod.addBodyLine(mapper);
+            selectMethod.addBodyLine("if(currentPage <= 0) {");
+            selectMethod.addBodyLine("currentPage = 1;");
+            selectMethod.addBodyLine("}");
+
+            selectMethod.addBodyLine("if(pageSize <= 0) {");
+            selectMethod.addBodyLine("pageSize = 10;");
+            selectMethod.addBodyLine("}");
+            selectMethod.addBodyLine("long totalCount = mapper.countByExample(example);");
+            selectMethod.addBodyLine("List<"+domainObjectName+"> dataList = mapper.selectByExamplePaging(example, (currentPage - 1) * pageSize, pageSize);");
+            selectMethod.addBodyLine("Page<"+domainObjectName+"> pageObj=new Page<>();");
+            selectMethod.addBodyLine("pageObj.setCurrentPage(currentPage);");
+            selectMethod.addBodyLine("pageObj.setCurrentPage(currentPage);");
+            selectMethod.addBodyLine("pageObj.setPageSize(pageSize);");
+            selectMethod.addBodyLine("pageObj.setDataList(dataList);");
+            selectMethod.addBodyLine("pageObj.setTotalCount(totalCount);");
+            selectMethod.addBodyLine("pageObj.setTotalPage((int)Math.ceil(totalCount/(float)pageSize));");
+            selectMethod.addBodyLine("return pageObj;");
+            selectMethod.addBodyLine("}");
+            topLevelClass.addMethod(selectMethod);
+        }
+
+
+        String targetProject=context.getJavaClientGeneratorConfiguration().getTargetProject();
+        String encoding = context.getProperty(PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING);
+        return new GeneratedJavaFile(topLevelClass,targetProject,encoding,context.getJavaFormatter());
+    }
+
+
+
+    private static Method getJavaBeansGetter(Field field) {
+        String getter = JavaBeansUtil.getGetterMethodName(field.getName(),field.getType());
+        Method method = new Method();
+        method.setVisibility(JavaVisibility.PUBLIC);
+        method.setReturnType(field.getType());
+        method.setName(getter);
+        StringBuilder sb = new StringBuilder();
+        sb.append("return ");
+        sb.append(field.getName());
+        sb.append(';');
+        method.addBodyLine(sb.toString());
+
+        return method;
+    }
+    private static Method getJavaBeansSetter(Field field) {
+        String getter = JavaBeansUtil.getSetterMethodName(field.getName());
+        Method method = new Method();
+        method.setVisibility(JavaVisibility.PUBLIC);
+        method.setReturnType(new FullyQualifiedJavaType("void"));
+        method.setName(getter);
+        method.addParameter(new Parameter(field.getType(),field.getName()));
+        StringBuilder sb = new StringBuilder();
+        sb.append("this.");
+        sb.append(field.getName());
+        sb.append(" = ");
+        sb.append(field.getName()).append(";");
+        method.addBodyLine(sb.toString());
+
+        return method;
     }
 
 }
