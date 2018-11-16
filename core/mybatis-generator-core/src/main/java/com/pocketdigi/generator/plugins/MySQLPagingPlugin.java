@@ -349,7 +349,6 @@ public class MySQLPagingPlugin extends PluginAdapter {
             selectMethod.addBodyLine("List<"+domainObjectName+"> dataList = mapper.selectByExamplePaging(example, (currentPage - 1) * pageSize, pageSize);");
             selectMethod.addBodyLine("Page<"+domainObjectName+"> pageObj=new Page<>();");
             selectMethod.addBodyLine("pageObj.setCurrentPage(currentPage);");
-            selectMethod.addBodyLine("pageObj.setCurrentPage(currentPage);");
             selectMethod.addBodyLine("pageObj.setPageSize(pageSize);");
             selectMethod.addBodyLine("pageObj.setDataList(dataList);");
             selectMethod.addBodyLine("pageObj.setTotalCount(totalCount);");
