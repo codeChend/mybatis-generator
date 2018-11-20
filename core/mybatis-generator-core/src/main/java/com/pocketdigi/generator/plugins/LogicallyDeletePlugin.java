@@ -222,7 +222,15 @@ public class LogicallyDeletePlugin extends PluginAdapter {
         StringBuilder sb = new StringBuilder();
         sb.append("update ");
         sb.append(introspectedTable.getFullyQualifiedTableNameAtRuntime());
-        sb.append(" set ").append(column).append("=").append("'").append(deletedValue).append("' ");
+
+        IntrospectedColumn deletedColumn = introspectedTable.getColumn(this.column);
+
+        if(deletedColumn.isStringColumn()){
+            sb.append(" set ").append(column).append("=").append("'").append(deletedValue).append("'");
+        }else if(deletedColumn.isIntegerColumn()||deletedColumn.isByteColumn()) {
+            sb.append(" set ").append(column).append("=").append(deletedValue);
+        }
+
         answer.addElement(new TextElement(sb.toString()));
         boolean and = false;
         for (IntrospectedColumn introspectedColumn : introspectedTable
@@ -259,7 +267,13 @@ public class LogicallyDeletePlugin extends PluginAdapter {
         StringBuilder sb = new StringBuilder();
         sb.append("update ");
         sb.append(introspectedTable.getFullyQualifiedTableNameAtRuntime());
-        sb.append(" set ").append(column).append("=").append("'").append(deletedValue).append("' ");
+
+        IntrospectedColumn deletedColumn = introspectedTable.getColumn(this.column);
+        if(deletedColumn.isStringColumn()){
+            sb.append(" set ").append(column).append("=").append("'").append(deletedValue).append("'");
+        }else if(deletedColumn.isIntegerColumn()||deletedColumn.isByteColumn()) {
+            sb.append(" set ").append(column).append("=").append(deletedValue);
+        }
         answer.addElement(new TextElement(sb.toString()));
 
         answer.addElement(getExampleIncludeElement(introspectedTable));
