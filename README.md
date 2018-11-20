@@ -8,7 +8,7 @@ MyBatis Generator 增强版
 ### 特性
 1. 字段、getter、setter注释。自动读取表字段注释，加到Model类上。
 2. 逻辑删除。可以设置逻辑删除字段、删除时的值、未删除时的值。支持数字和字符类型(2018.11.16)。
-3. Mysql物理分页。使用offset limit分页。增加PageHelper,一行代码直接出分页信息(currentPage，totalPage，pageSize，totalCount，dataList)支持数字和字符类型(2018.11.16)
+3. Mysql物理分页。使用offset limit分页。增加PageHelper,一行代码直接出分页信息(currentPage，totalPage，pageSize，totalCount，dataList)(2018.11.16)
 4. 通过Example找出一条数据
 5. 批量插入
 6. 优化生成的代码，去除部分sonar标记的'坏味道'
