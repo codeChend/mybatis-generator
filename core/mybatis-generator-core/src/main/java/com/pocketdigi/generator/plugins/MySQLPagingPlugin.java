@@ -162,7 +162,7 @@ public class MySQLPagingPlugin extends PluginAdapter {
 
         answer.addElement(new TextElement("select")); //$NON-NLS-1$
         XmlElement ifElement = new XmlElement("if"); //$NON-NLS-1$
-        ifElement.addAttribute(new Attribute("test", "distinct")); //$NON-NLS-1$ //$NON-NLS-2$
+        ifElement.addAttribute(new Attribute("test", "example.distinct")); //$NON-NLS-1$ //$NON-NLS-2$
         ifElement.addElement(new TextElement("distinct")); //$NON-NLS-1$
         answer.addElement(ifElement);
 
